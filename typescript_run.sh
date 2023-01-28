@@ -18,8 +18,8 @@ if [ "$1" == "version" ] ; then
 	exit
 fi
 export TERM=dump
-get_source_files ts
 
+get_source_files ts
 # ---------------------------------------------------------------------
 get_first_source_file ts
 
@@ -29,21 +29,16 @@ EOF
 )
 
 export STRTS
-perl -i.bak -pe 's/IMPORT_IO/$ENV{"STRJS"}/g' $FIRST_SOURCE_FILE
+perl -i.bak -pe 's/IMPORT_IO/$ENV{"STRTS"}/g' $FIRST_SOURCE_FILE
 
 # ---------------------------------------------------------------------
 
 
-SAVEIFS=$IFS
-IFS=$'\n'
-for FILENAME in $SOURCE_FILES
-do
-	tsc "$FILENAME" | sed 's/\x1b\[[0-9;]*[a-zA-Z]//g'
-done
-IFS=$SAVEIFS
+esbuild $SOURCE_FILES --outdir=. --format=cjs --log-level=error
 
 get_first_source_file ts
 FIRST_SOURCE_FILE="${FIRST_SOURCE_FILE%.*}.js"
 cat common_script.sh > vpl_execution
-echo "nodejs \"$FIRST_SOURCE_FILE\" \$@" >> vpl_execution
+echo "node \"$FIRST_SOURCE_FILE\" \$@" >> vpl_execution
 chmod +x vpl_execution
+
